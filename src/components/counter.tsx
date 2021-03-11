@@ -18,7 +18,7 @@ enum Upgrading {
 }
 
 const Counter: React.FC<NewComponent> = ({ message }) => {
-  const [numberOfPlayer, setNumberOfPlayer] = useState<number>(1);
+  const [numberOfPlayer, setNumberOfPlayer] = useState<number>(0);
 
   const [inputsName, setInputsName] = useState<inputProps[]>([]);
 
@@ -27,55 +27,47 @@ const Counter: React.FC<NewComponent> = ({ message }) => {
   const [isInput, setIsInput] = useState<boolean>(true);
   const [isGame, setIsGame] = useState<boolean>(false);
 
-  const objectChecker = () => {
-    // let x: Gamer = new Gamer("filip");
-    // let y: Gamer = new Gamer("michal");
-    // let z: Gamer = new Gamer("baalint");
-    // let arr: Gamer[] = [x, y, z];
-    // setGamers(arr);
-    console.log(gamers);
-  };
-  const getNumberOnClick = (numberOfPlayer: number /*, gamers: Gamer[]*/) => {
-    // console.log(numberOfPlayer);
-    // console.log(gamers);
-    // let arrTemp = [...gamers];
-    // arrTemp[0].level = 1;
-    // setGamers(arrTemp);
-    let x;
-    for (let i = 0; i < numberOfPlayer; i++) {
-      //x += <input></input>;
-    }
-    //setInputsName();
-  };
   const handleAdd = () => {
-    setNumberOfPlayer(numberOfPlayer + 1);
     setInputsName([...inputsName, { id: numberOfPlayer, name: "" }]);
-    let newGamer: Gamer = new Gamer("");
-    setGamers([...gamers, newGamer]);
+    setNumberOfPlayer(numberOfPlayer + 1);
   };
 
-  const handleNumberChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setNumberOfPlayer(parseInt(e.target.value));
+  const handleDelete = (index: number) => {
+    setNumberOfPlayer(numberOfPlayer - 1);
+    const inputsTemp = [...inputsName];
+    inputsTemp.splice(index, 1);
+    setInputsName(inputsTemp);
+    for (let i = 0; i < inputsTemp.length; i++) {
+      inputsTemp[i].id = i;
+    }
+    setInputsName(inputsTemp);
   };
 
   const handleGamerName = (e: ChangeEvent<HTMLInputElement>, i: number) => {
-    let arrTemp = [...gamers];
+    let arrTemp = [...inputsName];
     arrTemp[i].name = e.target.value;
-    setGamers(arrTemp);
+    setInputsName(arrTemp);
   };
 
   const initializeGamers = () => {
-    setIsInput(false);
-    setIsGame(true);
-    console.log(gamers);
+    if (inputsName.length > 0) {
+      let gamerTemp = [];
+      for (let i = 0; i < inputsName.length; i++) {
+        let newGamer: Gamer = new Gamer("");
+        newGamer.name = inputsName[i].name;
+        gamerTemp.push(newGamer);
+      }
+      setGamers(gamerTemp);
+      setIsInput(false);
+      setIsGame(true);
+    } else {
+      window.alert("PROSZE NAJPIERW DODAC GRACZY");
+    }
   };
 
   const handleUpgrades = (mode: Upgrading, index: number) => {
     let indexTemp = index - 1;
     let arrTemp = [...gamers];
-
-    console.log(`Mode: ${mode} Index:${indexTemp}`);
-    console.log(`UPGRADES FOR : ${gamers[indexTemp].name}`);
 
     switch (mode) {
       case Upgrading.LevelUp: {
@@ -120,8 +112,17 @@ const Counter: React.FC<NewComponent> = ({ message }) => {
       {isInput &&
         inputsName.map((inputField, i = 0) => (
           <div key={i + 1} className="d-flex justify-content-center m-3">
-            <input onChange={(event) => handleGamerName(event, i)}></input>
-            {inputField.id}
+            <button
+              type="button"
+              className="btn btn-danger btn-sm mx-1"
+              onClick={() => handleDelete(i)}
+            >
+              -
+            </button>
+            <input
+              value={inputField.name}
+              onChange={(event) => handleGamerName(event, i)}
+            />
           </div>
         ))}
       {isInput && (
